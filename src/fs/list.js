@@ -1,22 +1,31 @@
-import { readdir } from "node:fs/promises";
-import * as path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const pathToDir = path.join(__dirname, "files");
+import { readdir } from 'node:fs/promises';
+import { stdout } from 'node:process';
+import { writeOperationFailed } from '../streams/writeMessages.js';
 
 export const list = async path => {
   try {
-    const files = await readdir(path);
-    for (const file of files) console.log(file);
+    const files = await getFiles(path);
+    for (const file of files) {
+      console.log(file);
+    }
   } catch (e) {
-    if (e.code === "ENOENT") {
-      console.log("FS operation failed");
+    if (e.code === 'ENOENT') {
+      writeOperationFailed();
     } else {
-      console.log(e.message);
+      stdout.write(e.message);
     }
   }
 };
-list(pathToDir);
+
+export const getFiles = async path => {
+  try {
+    let files = await readdir(path);
+    return files;
+  } catch (e) {
+    if (e.code === 'ENOENT') {
+      writeOperationFailed();
+    } else {
+      stdout.write(e.message);
+    }
+  }
+};

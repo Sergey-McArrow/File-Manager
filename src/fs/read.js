@@ -1,26 +1,15 @@
-import { readFile } from "node:fs/promises";
-import * as path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const FILE = "fileToRead.txt";
-const pathToFile = path.join(__dirname, "files", FILE);
+import { readFile } from 'node:fs/promises';
+import { writeContent } from '../streams/writeMessages.js';
 
 export const read = async path => {
   try {
     const textFromFile = await readFile(
       path,
-      { encoding: "utf8" },
-      { withFileTypes: true }
+      { encoding: 'utf8' },
+      { flags: 'r' }
     );
-    console.log(textFromFile);
+    writeContent(textFromFile);
   } catch (e) {
-    if (e.code === "ENOENT") {
-      console.log("FS operation failed");
-    } else {
-      console.log(e.message);
-    }
+    console.log(e.message);
   }
 };
-read(pathToFile);
